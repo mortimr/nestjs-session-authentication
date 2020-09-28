@@ -1,15 +1,25 @@
+import { Logger } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express/interfaces/nest-express-application.interface'
 import * as bodyParser from 'body-parser'
+import * as chalk from 'chalk'
 import * as cookieParser from 'cookie-parser'
 import * as rateLimit from 'express-rate-limit'
 import * as helmet from 'helmet'
+import { WinstonModule } from 'nest-winston'
 import { AppModule } from './app.module'
 import { _prod } from './common/constants'
+import { WinstonConfigService } from './config/services/winston-config.service'
 import './validations/user'
+
 const main = async () => {
+	const logger = WinstonModule.createLogger(
+		new WinstonConfigService().createWinstonModuleOptions()
+	)
+
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-		cors: { origin: process.env.WWW_URL_BASE, credentials: true }
+		cors: { origin: process.env.WWW_URL_BASE, credentials: true },
+		logger
 	})
 
 	app.set('trust proxy', 1)
@@ -23,7 +33,6 @@ const main = async () => {
 		})
 	)
 
-	
 	if (_prod) {
 		app.use(helmet())
 
@@ -36,18 +45,37 @@ const main = async () => {
 	}
 
 	await app.listen(process.env.PORT || 3000, () => {
-		console.log(
-			`🚀 Server ready at http://localhost:${process.env.PORT}/${process.env.END_POINT}`
-		)
+		!_prod
+			? Logger.log(
+					`🚀  Server ready at http://${process.env.DOMAIN!}:${chalk
+						.hex(process.env.PRIMARY_COLOR!)
+						.bold(`${process.env.PORT!}`)}/${process.env.END_POINT!}`,
+					'Bootstrap',
+					false
+			  )
+			: Logger.log(
+					`🚀  Server is listening on port ${chalk
+						.hex(process.env.PRIMARY_COLOR!)
+						.bold(`${process.env.PORT!}`)}`,
+					'Bootstrap',
+					false
+			  )
+
+		!_prod &&
+			Logger.log(
+				`🚀  Subscriptions ready at ws://${process.env.DOMAIN!}:${chalk
+					.hex(process.env.PRIMARY_COLOR!)
+					.bold(`${process.env.PORT!}`)}/${process.env.END_POINT!}`,
+				'Bootstrap',
+				false
+			)
 	})
 }
 
 main()
 	.then(() => {
-		console.log('All systems go')
+		Logger.log('All systems go', 'Bootstrap', false)
 	})
 	.catch(e => {
-		console.error('Uncaught error in startup')
-		console.error('SERVER Error: ', e)
-		console.trace('SERVER Trace: ', e)
+		Logger.error(`❌  Error starting server, ${e}`, '', 'Bootstrap', false)
 	})

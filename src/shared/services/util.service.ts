@@ -10,6 +10,7 @@ import {
 	ErrorCodes,
 	FORGET_PASSWORD_PREFIX
 } from 'src/common/constants'
+import { User } from 'src/models/user.model'
 import { v4 } from 'uuid'
 
 @Injectable()
@@ -70,5 +71,49 @@ export class UtilService {
 
 	hashPassword(password: string): Promise<string> {
 		return hash(password)
+	}
+
+	async getEmailConfig(emailType: 'forgot' | 'verify', { id, email }: User) {
+		const link = await this.createVerifyLink(id)
+		const cxtBase = {
+			author: this.configService.get(ENV.AUTHOR),
+			baseUrl: this.configService.get(ENV.WWW_BASE_URL),
+			link,
+			text2: ', you can safely delete this email.',
+			text3:
+				"If that doesn't work, copy and paste the following link in your browser:"
+		}
+		const templateConfig = {
+			verify: {
+				template: 'index', // The `.pug` or `.hbs` extension is appended automatically.
+				subject: 'Email Confirmation',
+				context: {
+					...cxtBase,
+					title: 'Email Confirmation',
+					subject: 'Verify Email',
+					h1: 'Confirm Your Email Address',
+					button: 'Verify Email',
+					text1:
+						"Tap the button below to confirm your email address. If you didn't create an account with"
+				}
+			},
+			forgot: {
+				template: 'index', // The `.pug` or `.hbs` extension is appended automatically.
+				subject: 'Password Reset',
+				context: {
+					...cxtBase,
+					title: 'Password Reset',
+					subject: 'Password Reset',
+					h1: 'Reset Your Password',
+					button: 'Set New Password',
+					text1:
+						"Tap the button below to reset your customer account password. If you didn't request a new password from"
+				}
+			}
+		}
+		return {
+			to: email,
+			...templateConfig[emailType]
+		}
 	}
 }

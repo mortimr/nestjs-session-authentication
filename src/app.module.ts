@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common'
+import { Logger, Module, OnModuleInit } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core'
 import { GraphQLModule } from '@nestjs/graphql'
@@ -18,7 +18,6 @@ import { AppController } from './controllers/app.controller'
 import { ComplexityPlugin } from './plugins/gql-complexity.plugin'
 import { UserModule } from './user/user.module'
 
-
 @Module({
 	imports: [
 		ConfigModule.forRoot({ isGlobal: true }),
@@ -33,6 +32,7 @@ import { UserModule } from './user/user.module'
 		UserModule
 	],
 	providers: [
+		Logger,
 		AppService,
 		DateScalar,
 		{
@@ -51,6 +51,7 @@ import { UserModule } from './user/user.module'
 			provide: 'PUB_SUB',
 			useValue: new PubSub()
 		}
+		
 	],
 	controllers: [AppController]
 })

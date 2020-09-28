@@ -4,15 +4,21 @@ import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql'
 import { ApolloError } from 'apollo-server-express'
 import chalk from 'chalk'
 import * as depthLimit from 'graphql-depth-limit'
+import { Redis } from 'ioredis'
+import { RedisService } from 'nestjs-redis'
 import { ENV, ErrorCodes, _prod } from 'src/common/constants'
 
 @Injectable()
 class GqlConfigService implements GqlOptionsFactory {
-	constructor(private configService: ConfigService) {}
+	constructor(
+		private configService: ConfigService,
+		private redisService: RedisService
+	) {}
 
 	createGqlOptions(): GqlModuleOptions {
 		const END_POINT = this.configService.get(ENV.END_POINT)
 		const GRAPHQL_DEPTH_LIMIT = this.configService.get(ENV.GRAPHQL_DEPTH_LIMIT)
+		const redisClient: Redis = this.redisService.getClient('redis')
 		return {
 			bodyParserConfig: { limit: '50mb' },
 			onHealthCheck: () => {
@@ -44,7 +50,8 @@ class GqlConfigService implements GqlOptionsFactory {
 			cors: this.configService.get(ENV.CORS_ENABLE) === '1' ? true : false,
 			context: ({ req, res }) => ({
 				req,
-				res
+				res,
+				redisClient
 			}),
 			validationRules: [
 				depthLimit(

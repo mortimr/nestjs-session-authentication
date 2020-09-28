@@ -1,7 +1,7 @@
 export const _prod = process.env.NODE_ENV === 'production'
 export const FORGET_PASSWORD_PREFIX = 'forget-password:'
 export const CONFIRM_EMAIL_PREFIX = 'confirm-email:'
-
+export const ONE_DAY = 60 * 60 * 24
 export const ENV = {
 	WWW_BASE_URL: 'WWW_BASE_URL',
 	NODE_ENV: 'NODE_ENV',
@@ -26,7 +26,8 @@ export const ENV = {
 	AUTHOR: 'AUTHOR',
 	GRAPHQL_DEPTH_LIMIT: 'GRAPHQL_DEPTH_LIMIT',
 	PRIMARY_COLOR: 'PRIMARY_COLOR',
-	END_POINT: 'END_POINT'
+	END_POINT: 'END_POINT',
+	DOMAIN: 'DOMAIN'
 }
 
 export const ErrorCodes = {

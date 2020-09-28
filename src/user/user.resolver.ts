@@ -8,6 +8,7 @@ import {
 	Root
 } from '@nestjs/graphql'
 import { validate } from 'class-validator'
+import { GqlRatelimitGuard } from 'src/common/extensions/gql-rate-limit.extension'
 import { CurrentUser } from 'src/utils/decorators/graphql/current-user.gql.decorator'
 import { UserIdArgs } from '../common/args/user-id.args'
 import { User } from '../models/user.model'
@@ -59,6 +60,7 @@ export class UserResolver {
 		return this.userService.updateUser(userId, input)
 	}
 
+	@UseGuards(GqlRatelimitGuard)
 	@Mutation(() => Boolean)
 	async forgotPassword(@Args('email') email: string): Promise<boolean> {
 		await validate('validateEmail', email)

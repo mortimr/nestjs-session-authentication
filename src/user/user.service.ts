@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { InjectModel } from '@nestjs/mongoose'
 import { ForbiddenError, UserInputError } from 'apollo-server-express'
 import { Model } from 'mongoose'
-import { ENV, ErrorCodes, FORGET_PASSWORD_PREFIX } from 'src/common/constants'
+import { ErrorCodes, FORGET_PASSWORD_PREFIX } from 'src/common/constants'
 import { User } from '../models/user.model'
 import { UtilService } from '../shared/services/util.service'
 import { ChangePasswordInput } from '../user/dto/change-password.input'
@@ -33,26 +33,8 @@ export class UserService {
 		if (!user) {
 			return true
 		}
-		const url = await this.utilService.createForgotPasswordLink(user.id)
-		await this.mailerService.sendMail({
-			to: email,
-			subject: 'Password Reset',
-			template: 'index', // The `.pug` or `.hbs` extension is appended automatically.
-			context: {
-				author: this.configService.get(ENV.AUTHOR),
-				title: 'Password Reset',
-				baseUrl: this.configService.get(ENV.WWW_BASE_URL),
-				link: url,
-				subject: 'Password Reset',
-				h1: 'Reset Your Password',
-				button: 'Set New Password',
-				text1:
-					"Tap the button below to reset your customer account password. If you didn't request a new password from",
-				text2: ', you can safely delete this email.',
-				text3:
-					"If that doesn't work, copy and paste the following link in your browser:"
-			}
-		})
+		const mailConfig = await this.utilService.getEmailConfig('forgot', user)
+		await this.mailerService.sendMail(mailConfig)
 
 		return true
 	}

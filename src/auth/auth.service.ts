@@ -1,12 +1,10 @@
 import { MailerService } from '@nestjs-modules/mailer'
-import {
-	Injectable
-} from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { InjectModel } from '@nestjs/mongoose'
 import { ForbiddenError, UserInputError } from 'apollo-server-core'
 import { Model } from 'mongoose'
-import { CONFIRM_EMAIL_PREFIX, ENV, ErrorCodes } from 'src/common/constants'
+import { CONFIRM_EMAIL_PREFIX, ErrorCodes } from 'src/common/constants'
 import { User } from '../models/user.model'
 import { UtilService } from '../shared/services/util.service'
 import { SignupInput } from './dto/signup.input'
@@ -35,26 +33,8 @@ export class AuthService {
 				role: 'USER'
 			}).save()
 
-			const url = await this.utilService.createVerifyLink(user.id)
-			await this.mailerService.sendMail({
-				to: email,
-				subject: 'Email Confirmation',
-				template: 'index', // The `.pug` or `.hbs` extension is appended automatically.
-				context: {
-					author: 'YourApp',
-					title: 'Email Confirmation',
-					baseUrl: this.configService.get(ENV.WWW_BASE_URL),
-					link: url,
-					subject: 'Verify Email',
-					h1: 'Confirm Your Email Address',
-					button: 'Verify Email',
-					text1:
-						"Tap the button below to confirm your email address. If you didn't create an account with",
-					text2: ', you can safely delete this email.',
-					text3:
-						"If that doesn't work, copy and paste the following link in your browser:"
-				}
-			})
+			const mailConfig = await this.utilService.getEmailConfig('verify', user)
+			await this.mailerService.sendMail(mailConfig)
 
 			return true
 		} catch (error) {
