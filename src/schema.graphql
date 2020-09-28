@@ -1,0 +1,64 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input ChangePasswordInput {
+  newPassword: String!
+  oldPassword: String!
+}
+
+"""Date custom scalar type"""
+scalar Date
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  changePassword(input: ChangePasswordInput!): User!
+  forgotPassword(email: String!): Boolean!
+  login(input: LoginInput!): User!
+  logout: Boolean!
+  resetPassword(input: ResetPasswordInput!): User!
+  signup(input: SignupInput!): Boolean!
+  updateUser(input: UpdateUserInput!): User!
+  verify(token: String!): Boolean!
+}
+
+type Query {
+  me: User!
+  user: User
+  users: [User!]!
+}
+
+input ResetPasswordInput {
+  newPassword: String!
+  token: String!
+}
+
+"""User role"""
+enum Role {
+  ADMIN
+  USER
+}
+
+input SignupInput {
+  email: String!
+  password: String!
+  username: String!
+}
+
+input UpdateUserInput {
+  username: String
+}
+
+type User {
+  createdAt: Date!
+  email: String!
+  id: ID!
+  role: Role!
+  updatedAt: Date!
+  username: String!
+  verified: Boolean!
+}
