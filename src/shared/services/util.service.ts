@@ -74,9 +74,14 @@ export class UtilService {
 	}
 
 	async getEmailConfig(emailType: 'forgot' | 'verify', { id, email }: User) {
+		const link =
+			emailType == 'forgot'
+				? await this.createForgotPasswordLink(id)
+				: await this.createVerifyLink(id)
 		const cxtBase = {
 			author: this.configService.get(ENV.AUTHOR),
 			baseUrl: this.configService.get(ENV.WWW_BASE_URL),
+
 			text2: ', you can safely delete this email.',
 			text3:
 				"If that doesn't work, copy and paste the following link in your browser:"
@@ -87,7 +92,7 @@ export class UtilService {
 				subject: 'Email Confirmation',
 				context: {
 					...cxtBase,
-					link: await this.createVerifyLink(id),
+					link,
 					title: 'Email Confirmation',
 					subject: 'Verify Email',
 					h1: 'Confirm Your Email Address',
@@ -101,7 +106,7 @@ export class UtilService {
 				subject: 'Password Reset',
 				context: {
 					...cxtBase,
-					link: await this.createForgotPasswordLink(id),
+					link,
 					title: 'Password Reset',
 					subject: 'Password Reset',
 					h1: 'Reset Your Password',
@@ -113,6 +118,7 @@ export class UtilService {
 		}
 		return {
 			to: email,
+
 			...templateConfig[emailType]
 		}
 	}
