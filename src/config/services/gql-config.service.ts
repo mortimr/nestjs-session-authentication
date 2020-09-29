@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { GqlModuleOptions, GqlOptionsFactory } from '@nestjs/graphql'
 import { ApolloError } from 'apollo-server-express'
-import chalk from 'chalk'
 import * as depthLimit from 'graphql-depth-limit'
 import { Redis } from 'ioredis'
 import { RedisService } from 'nestjs-redis'
@@ -58,14 +57,10 @@ class GqlConfigService implements GqlOptionsFactory {
 					GRAPHQL_DEPTH_LIMIT,
 					{ ignore: [/_trusted$/, 'idontcare'] },
 					depths => {
-						if (
-							depths[''] ===
-							this.configService.get(ENV.GRAPHQL_DEPTH_LIMIT) - 1
-						) {
+						if (depths[''] === GRAPHQL_DEPTH_LIMIT - 1) {
 							Logger.warn(
-								`⚠️  You can only descend ${chalk
-									.hex(this.configService.get(ENV.PRIMARY_COLOR)!)
-									.bold(`${ENV.GRAPHQL_DEPTH_LIMIT!}`)} levels.`,
+								`⚠️  You can only descend 
+									${GRAPHQL_DEPTH_LIMIT!} levels.`,
 								'GraphQL',
 								false
 							)

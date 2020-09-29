@@ -12,8 +12,7 @@ import { GqlExceptionFilter } from '@nestjs/graphql'
 export class DispatchError implements GqlExceptionFilter {
 	constructor(@Inject(Logger) private readonly logger: LoggerService) {}
 	catch(exception: HttpException, host: ArgumentsHost) {
-		this.logger.error(`❌  ${exception.message}`, '', 'Error Filter')
-		Logger.error(`❌  ${exception.message}`, '', 'Error Filter', false)
+		
 		return exception
 	}
 }

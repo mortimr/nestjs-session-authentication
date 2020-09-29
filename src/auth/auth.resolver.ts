@@ -1,6 +1,5 @@
 import { ConfigService } from '@nestjs/config'
 import { Args, Mutation, Resolver } from '@nestjs/graphql'
-import { validate } from 'class-validator'
 import { ENV } from 'src/common/constants'
 import { MyContext } from 'src/common/types/ctx.type'
 import { MyCtx } from 'src/utils/decorators/graphql/ctx.decorator'
@@ -19,11 +18,6 @@ export class AuthResolver {
 
 	@Mutation(() => Boolean)
 	async signup(@Args('input') input: SignupInput) {
-		try {
-			await validate('createUser', input)
-		} catch (error) {
-			console.log(error)
-		}
 		return this.authService.createUser(input)
 	}
 

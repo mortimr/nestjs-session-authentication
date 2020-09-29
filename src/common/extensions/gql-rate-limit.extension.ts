@@ -16,7 +16,7 @@ export class GqlRatelimitGuard implements CanActivate {
 		}`
 
 		const current = await redisClient.incr(key)
-		const limit = { forgotPassword: 3 }
+		const limit = { forgotPassword: 100}
 		if (current > limit[info.fieldName]) {
 			throw new ApolloError("You're doing that too much!")
 		} else if (current === 1) {

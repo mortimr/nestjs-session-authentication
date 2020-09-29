@@ -1,28 +1,28 @@
 version: "3.7"
 
 services:
-  # main:
-    # container_name: main
-    # restart: always
-    # build:
-    #   context: .
-    #   target: ${NODE_ENV}
-    # user: "node"
-    # volumes:
-    #   - .:/usr/src/app
-    #   - /usr/src/app/dist
-    #   - /usr/src/app/node_modules
-    # ports:
-    #   - ${PORT}:${PORT}
-    #   - 9229:9229 # FOR DEBUG
-    # command: npm run start:dev
-    # env_file:
-    #   - .env
-    # networks:
-    #   - webnet
-    # depends_on:
-    #   - redis
-    #   - mongo
+  main:
+    container_name: main
+    restart: always
+    build:
+      context: .
+      target: ${NODE_ENV}
+    user: "node"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/dist
+      - /usr/src/app/node_modules
+    ports:
+      - ${PORT}:${PORT}
+      - 9229:9229 # FOR DEBUG
+    command: npm run start:dev
+    env_file:
+      - .env
+    networks:
+      - webnet
+    depends_on:
+      - redis
+      - mongo
 
   redis:
     image: redis

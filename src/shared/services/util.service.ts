@@ -8,7 +8,8 @@ import {
 	CONFIRM_EMAIL_PREFIX,
 	ENV,
 	ErrorCodes,
-	FORGET_PASSWORD_PREFIX
+	FORGET_PASSWORD_PREFIX,
+	ONE_DAY
 } from 'src/common/constants'
 import { User } from 'src/models/user.model'
 import { v4 } from 'uuid'
@@ -30,7 +31,7 @@ export class UtilService {
 			`${FORGET_PASSWORD_PREFIX}${token}`,
 			userId,
 			'ex',
-			1000 * 60 * 20
+			ONE_DAY
 		)
 
 		return `${this.configService.get(
@@ -45,7 +46,7 @@ export class UtilService {
 			`${CONFIRM_EMAIL_PREFIX}${token}`,
 			userId,
 			'ex',
-			1000 * 60 * 60 * 24 * 3
+			ONE_DAY * 3
 		)
 
 		return `${this.configService.get(ENV.WWW_BASE_URL)}/verify/${token}`
@@ -55,7 +56,6 @@ export class UtilService {
 		const key = `${prefix}${token}`
 
 		const userId = await this.redisClient.get(key)
-
 		if (!userId) {
 			throw new ForbiddenError(ErrorCodes.TOKEN_EXPIRED)
 		}
@@ -74,11 +74,9 @@ export class UtilService {
 	}
 
 	async getEmailConfig(emailType: 'forgot' | 'verify', { id, email }: User) {
-		const link = await this.createVerifyLink(id)
 		const cxtBase = {
 			author: this.configService.get(ENV.AUTHOR),
 			baseUrl: this.configService.get(ENV.WWW_BASE_URL),
-			link,
 			text2: ', you can safely delete this email.',
 			text3:
 				"If that doesn't work, copy and paste the following link in your browser:"
@@ -89,6 +87,7 @@ export class UtilService {
 				subject: 'Email Confirmation',
 				context: {
 					...cxtBase,
+					link: await this.createVerifyLink(id),
 					title: 'Email Confirmation',
 					subject: 'Verify Email',
 					h1: 'Confirm Your Email Address',
@@ -102,6 +101,7 @@ export class UtilService {
 				subject: 'Password Reset',
 				context: {
 					...cxtBase,
+					link: await this.createForgotPasswordLink(id),
 					title: 'Password Reset',
 					subject: 'Password Reset',
 					h1: 'Reset Your Password',
