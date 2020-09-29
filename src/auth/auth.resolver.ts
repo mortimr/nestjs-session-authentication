@@ -43,7 +43,6 @@ export class AuthResolver {
 			req.session.destroy(err => {
 				res.clearCookie(this.configService.get(ENV.COOKIE_NAME))
 				if (err) {
-					console.log(err)
 					resolve(false)
 					return
 				}

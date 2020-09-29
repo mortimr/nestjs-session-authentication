@@ -75,7 +75,6 @@ export class UserResolver {
 
 	@Mutation(() => User)
 	async resetPassword(@Args('input') input: ResetPasswordInput): Promise<User> {
-		console.log(input)
 		return this.userService.resetPassword(input)
 	}
 }
