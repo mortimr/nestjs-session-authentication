@@ -42,7 +42,7 @@ const main = async () => {
 		)
 	}
 
-	await app.listen(process.env.PORT || 3000, () => {
+	await app.listen(process.env.PORT || 4000, () => {
 		!_prod
 			? Logger.log(
 					`🚀  Server ready at http://${process.env.DOMAIN!}:${process.env

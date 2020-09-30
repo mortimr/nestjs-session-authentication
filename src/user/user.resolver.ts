@@ -7,9 +7,9 @@ import {
 	Resolver,
 	Root
 } from '@nestjs/graphql'
+import { UserIdArgs } from 'src/common/args/user-id.args'
 import { GqlRatelimitGuard } from 'src/common/extensions/gql-rate-limit.extension'
 import { CurrentUser } from 'src/utils/decorators/graphql/current-user.gql.decorator'
-import { UserIdArgs } from '../common/args/user-id.args'
 import { User } from '../models/user.model'
 import { GqlAuthGuard } from '../utils/guards/graphql/gql-auth.guard'
 import { ChangePasswordInput } from './dto/change-password.input'
@@ -37,9 +37,7 @@ export class UserResolver {
 
 	@UseGuards(GqlAuthGuard)
 	@Query(() => User, { nullable: true })
-	user(
-		@Args({ nullable: false }) { userId }: UserIdArgs
-	): Promise<User | undefined> {
+	user(@Args('UserIdArgs') { userId }: UserIdArgs): Promise<User> {
 		return this.userService.findUser(userId)
 	}
 

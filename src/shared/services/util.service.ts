@@ -11,6 +11,7 @@ import {
 	FORGET_PASSWORD_PREFIX,
 	ONE_DAY
 } from 'src/common/constants'
+import { ObjectId, UserId } from 'src/common/types/ObjectId.type'
 import { User } from 'src/models/user.model'
 import { v4 } from 'uuid'
 
@@ -52,7 +53,15 @@ export class UtilService {
 		return `${this.configService.get(ENV.WWW_BASE_URL)}/verify/${token}`
 	}
 
-	async getUserIdFromToken(token: string, prefix: string): Promise<string> {
+	stringToObjectId(userId: string): UserId {
+		return new ObjectId(userId) as any
+	}
+
+	objectIdToString(userId: any): string {
+		return new ObjectId(userId).toHexString()
+	}
+
+	async getUserIdFromToken(token: string, prefix: string) {
 		const key = `${prefix}${token}`
 
 		const userId = await this.redisClient.get(key)

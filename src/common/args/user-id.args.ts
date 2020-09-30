@@ -1,8 +1,10 @@
-import { ArgsType } from '@nestjs/graphql';
-import { IsNotEmpty } from 'class-validator';
+import { Field, InputType } from '@nestjs/graphql'
+import { IsMongoId, IsNotEmpty } from 'class-validator'
 
-@ArgsType()
+@InputType()
 export class UserIdArgs {
-  @IsNotEmpty()
-  userId: string;
+	@Field()
+	@IsNotEmpty()
+	@IsMongoId()
+	userId: string
 }

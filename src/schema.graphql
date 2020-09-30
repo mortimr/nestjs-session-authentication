@@ -28,7 +28,7 @@ type Mutation {
 
 type Query {
   me: User!
-  user: User
+  user(UserIdArgs: UserIdArgs!): User
   users: [User!]!
 }
 
@@ -61,4 +61,8 @@ type User {
   updatedAt: Date!
   username: String!
   verified: Boolean!
+}
+
+input UserIdArgs {
+  userId: String!
 }

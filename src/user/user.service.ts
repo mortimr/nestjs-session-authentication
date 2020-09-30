@@ -21,7 +21,11 @@ export class UserService {
 	) {}
 
 	async findUser(userId: string) {
-		return this.userModel.findById(userId)
+		const user = await this.userModel.findById(userId)
+		if (!user) {
+			throw new ForbiddenError(ErrorCodes.USER_NOT_FOUND)
+		}
+		return user
 	}
 
 	async findUsers() {
@@ -45,14 +49,9 @@ export class UserService {
 
 	async changePassword(
 		userId: string,
-
 		{ oldPassword, newPassword }: ChangePasswordInput
 	) {
-		const user = await this.userModel.findById(userId)
-
-		if (!user) {
-			throw new ForbiddenError(ErrorCodes.USER_NOT_FOUND)
-		}
+		const user = await this.findUser(userId)
 
 		const passwordValid = await this.utilService.validatePassword(
 			oldPassword,
@@ -76,10 +75,8 @@ export class UserService {
 			FORGET_PASSWORD_PREFIX
 		)
 
-		const user = await this.userModel.findById(userId)
-		if (!user) {
-			throw new ForbiddenError(ErrorCodes.USER_NOT_FOUND)
-		}
+		const user = await this.findUser(userId)
+
 		user.password = await this.utilService.hashPassword(newPassword)
 
 		await user.save()
