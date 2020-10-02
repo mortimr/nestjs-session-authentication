@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express/interfaces/nest-express-application.interface'
 import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
+import * as cors from 'cors'
 import * as rateLimit from 'express-rate-limit'
 import * as helmet from 'helmet'
 import { WinstonModule } from 'nest-winston'
@@ -16,11 +17,16 @@ const main = async () => {
 	)
 
 	const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-		cors: { origin: process.env.WWW_URL_BASE, credentials: true },
 		logger
 	})
 
 	app.set('trust proxy', 1)
+	app.use(
+		cors({
+			origin: process.env.WWW_BASE_URL,
+			credentials: true
+		})
+	)
 	app.use(cookieParser())
 	app.use(bodyParser.json({ limit: '50mb' }))
 	app.use(
